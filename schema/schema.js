@@ -7,7 +7,8 @@ const {
     GraphQLString,
     GraphQLInt,
     GraphQLSchema,
-    GraphQLList
+    GraphQLList,
+    GraphQLNonNull
 } = graphql;
 
 const users = [
@@ -99,7 +100,28 @@ const RootQuery = new GraphQLObjectType({
     }
 })
 
+const mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        addUser: {
+            type: UserType, //Type of the data that the resolve() function returns
+            args: {
+                // "GraphQLNonNull" makes sure that the field is mandatory.  
+                firstName: { type: new GraphQLNonNull(GraphQLString) },
+                age: { type: new GraphQLNonNull(GraphQLInt) },
+                // companyId is not a mandatory field
+                companyId: { type: GraphQLString }
+            },
+            resolve(parentValue, { firstName, age }) {
+                return axios.post(`http://localhost:3000/users`, { firstName, age })
+                            .then(response => response.data)
+            }
+        }
+    }
+})
+
 //GraphQLSchema takes a root query and returns a GraphQL schema instance. 
 module.exports = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: mutation
 })
