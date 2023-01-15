@@ -2,8 +2,8 @@
   "users": [
     {
       "id": "23",
-      "firstName": "Bill",
-      "age": 20,
+      "firstName": "rama",
+      "age": 15,
       "companyId": "1"
     },
     {
@@ -17,11 +17,6 @@
       "firstName": "Samantha",
       "age": 70,
       "companyId": "2"
-    },
-    {
-      "firstName": "satya",
-      "age": 20,
-      "id": "JeVYRjb"
     }
   ],
   "companies": [
