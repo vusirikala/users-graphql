@@ -29,6 +29,9 @@ const UserType = new GraphQLObjectType({
     }
 })
 
+
+//A root query is something that allows us to jump in a graph of data. Eg: Find user with ID 23. 
+//Root query is an entry point into an application. 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
@@ -47,6 +50,7 @@ const RootQuery = new GraphQLObjectType({
     }
 })
 
+//GraphQLSchema takes a root query and returns a GraphQL schema instance. 
 module.exports = new GraphQLSchema({
     query: RootQuery
 })
