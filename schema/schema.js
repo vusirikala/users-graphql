@@ -6,7 +6,8 @@ const {
     GraphQLObjectType,
     GraphQLString,
     GraphQLInt,
-    GraphQLSchema
+    GraphQLSchema,
+    GraphQLList
 } = graphql;
 
 const users = [
@@ -14,10 +15,12 @@ const users = [
     {id: '47', firstName: 'Samantha', age: 21}
 ];
 
-//It's very important to define the CompanyType before UserType
 const CompanyType = new GraphQLObjectType({
     name: 'Company',
-    fields: {
+    // We are using CompanyType when defining UserType, and using UserType when defining CompanyType. This will lead to an error if we directly define the fields: {}. 
+    // Instead of defining fields: {...}, we are defining an arrow function fields: () => {}. 
+    // GraphQL will run the arrow function after the entire file has been executed. 
+    fields: () => ({
         id: {
             type: GraphQLString
         },
@@ -26,14 +29,21 @@ const CompanyType = new GraphQLObjectType({
         },
         description: {
             type: GraphQLString
+        },
+        users: {
+            type: new GraphQLList(UserType),
+            resolve(parentValue, args) {
+                return axios.get(`http://localhost:3000/companies/${parentValue.id}/users`)
+                            .then(response => response.data)
+            }
         }
-    }
+    })
 })
 
 //This object instructs graphql on what a User object looks like.  
 const UserType = new GraphQLObjectType({
     name: 'User',
-    fields: {
+    fields: () => ({
         id: { 
             type: GraphQLString
         },
@@ -53,7 +63,7 @@ const UserType = new GraphQLObjectType({
                     .then(response => response.data)
             }
         }
-    }
+    })
 })
 
 
