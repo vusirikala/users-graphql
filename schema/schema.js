@@ -1,3 +1,4 @@
+const { default: axios } = require('axios');
 const graphql = require('graphql');
 const _ = require('lodash');
 
@@ -13,6 +14,22 @@ const users = [
     {id: '47', firstName: 'Samantha', age: 21}
 ];
 
+//It's very important to define the CompanyType before UserType
+const CompanyType = new GraphQLObjectType({
+    name: 'Company',
+    fields: {
+        id: {
+            type: GraphQLString
+        },
+        name: {
+            type: GraphQLString
+        },
+        description: {
+            type: GraphQLString
+        }
+    }
+})
+
 //This object instructs graphql on what a User object looks like.  
 const UserType = new GraphQLObjectType({
     name: 'User',
@@ -25,6 +42,16 @@ const UserType = new GraphQLObjectType({
         },
         age: {
             type: GraphQLInt
+        },
+        //Note that JSON server database uses "companyId" and we use "company" here
+        //"companyId" is of type 'Id'.  "company" is of type "Company"
+        //We need to define a resolve function to resolve the difference. The incoming data has "id", the resolve function will resolve it to "Company"
+        company: {                  
+            type: CompanyType,
+            resolve(parentValue, args) {
+                return axios.get(`http://localhost:3000/companies/${parentValue.companyId}`)
+                    .then(response => response.data)
+            }
         }
     }
 })
@@ -44,7 +71,11 @@ const RootQuery = new GraphQLObjectType({
             //parentValue argument is notorious for rarely being used
             //args contains whatever arguments we pass into the original query
             resolve(parentValue, args) {
-                return _.find(users, {id : args.id})
+                // Use this statement to resolve the query by searching the JSON object
+                // return _.find(users, {id : args.id})
+
+                return axios.get(`http://localhost:3000/users/${args.id}`)
+                            .then(response => response.data)
             }
        }
     }
